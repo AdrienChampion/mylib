@@ -1,5 +1,6 @@
 //! Things I find useful.
 
+extern crate ansi_term as ansi ;
 
 /// Convenient re-exports.
 pub mod common {
@@ -58,13 +59,13 @@ fn main() {
   let mut buff = String::new() ;
   for_first!(
     result.lines() => {
-      |fst_line| buff.push_str( & format!("{}", fst_line) ),
+      |fst_line| buff.push_str(fst_line),
       then |nxt_line| {
         buff.push(':') ;
         if nxt_line == "several" {
           buff.push_str("one")
         } else {
-          buff.push_str( & format!("{}", nxt_line) )
+          buff.push_str(nxt_line)
         }
       }
     }
@@ -108,6 +109,40 @@ macro_rules! for_first {
         then |$thn| $e_thn,
         yild (())
       } else (())
+    }
+  ) ;
+}
+
+
+
+#[doc = r#"Helper to implement `Display` for a type.
+
+```
+#[macro_use]
+extern crate mylib ;
+
+struct Blah { name: String, n: usize }
+impl_fmt!{
+  Blah(self, fmt) {
+    write!(fmt, "{}({})", self.name, self.n)
+  }
+}
+
+fn main() {
+  let blah = Blah { name: "name".into(), n: 7 } ;
+  assert_eq!( format!("{}", blah), "name(7)" )
+}
+```
+"#]
+#[macro_export]
+macro_rules! impl_fmt {
+  (
+    $t:ident ($slf:ident, $fmt:ident) $b:block
+  ) => (
+    impl ::std::fmt::Display for $t {
+      fn fmt(
+        & $slf, $fmt: & mut ::std::fmt::Formatter
+      ) -> ::std::fmt::Result $b
     }
   ) ;
 }
