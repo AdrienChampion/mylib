@@ -107,8 +107,22 @@ macro_rules! for_first {
       $iter => {
         |$fst| $e_fst,
         then |$thn| $e_thn,
-        yild (())
-      } else (())
+        yild ()
+      } else ()
+    }
+  ) ;
+  (
+    $iter:expr => {
+      |$fst:pat| $e_fst:expr,
+      then |$thn:pat| $e_thn:expr $(,)*
+    } else $e_els:expr
+  ) => (
+    for_first!{
+      $iter => {
+        |$fst| $e_fst,
+        then |$thn| $e_thn,
+        yild ()
+      } else $e_els
     }
   ) ;
 }

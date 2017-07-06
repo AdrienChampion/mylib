@@ -388,6 +388,12 @@ macro_rules! wrap_usize {
         $map { vec: vec![ elem ; size ] }
       }
     }
+    impl<T> ::std::convert::From< Vec<T> > for $map<T> {
+      #[inline]
+      fn from(vec: Vec<T>) -> Self {
+        $map { vec }
+      }
+    }
     impl<T> ::std::iter::IntoIterator for $map<T> {
       type Item = T ;
       type IntoIter = ::std::vec::IntoIter<T> ;
