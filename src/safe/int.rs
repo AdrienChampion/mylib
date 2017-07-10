@@ -487,7 +487,8 @@ macro_rules! wrap_usize {
     }
     impl<T> $iter<$map<T>> {
       /// Creates an iterator starting at 0.
-      fn mk(map: $map<T>) -> Self {
+      fn mk(mut map: $map<T>) -> Self {
+        map.vec.reverse() ;
         $iter { cursor: $t::zero(), map: map }
       }
     }
