@@ -367,7 +367,13 @@ macro_rules! wrap_usize {
       }
       /// Iterates over the elements with the index.
       #[inline]
-      pub fn index_iter<'a>(& 'a self) -> $iter<'a, T> where T: 'a {
+      pub fn index_iter<'a>(& 'a self) -> $iter<& 'a $map<T>>
+      where T: 'a {
+        $iter::mk_ref(self)
+      }
+      /// Iterates over the elements with the index.
+      #[inline]
+      pub fn into_index_iter(self) -> $iter<$map<T>> {
         $iter::mk(self)
       }
       /// Iterates over the elements (mutable version).
@@ -457,17 +463,17 @@ macro_rules! wrap_usize {
     }
     /// Structure allowing to iterate over the elements of a map and their
     /// index.
-    pub struct $iter<'a, T: 'a> {
+    pub struct $iter<T> {
       cursor: $t,
-      map: & 'a $map<T>,
+      map: T,
     }
-    impl<'a, T> $iter<'a, T> {
+    impl<'a, T> $iter<& 'a $map<T>> {
       /// Creates an iterator starting at 0.
-      fn mk(map: & 'a $map<T>) -> Self {
+      fn mk_ref(map: & 'a $map<T>) -> Self {
         $iter { cursor: $t::zero(), map: map }
       }
     }
-    impl<'a, T: 'a> ::std::iter::Iterator for $iter<'a, T> {
+    impl<'a, T: 'a> ::std::iter::Iterator for $iter<& 'a $map<T>> {
       type Item = ($t, & 'a T) ;
       fn next(& mut self) -> Option< ($t, & 'a T) > {
         if self.cursor >= self.map.len() {
@@ -476,6 +482,24 @@ macro_rules! wrap_usize {
           let res = (self.cursor, & self.map[self.cursor]) ;
           self.cursor.inc() ;
           Some(res)
+        }
+      }
+    }
+    impl<T> $iter<$map<T>> {
+      /// Creates an iterator starting at 0.
+      fn mk(map: $map<T>) -> Self {
+        $iter { cursor: $t::zero(), map: map }
+      }
+    }
+    impl<T> ::std::iter::Iterator for $iter<$map<T>> {
+      type Item = ($t, T) ;
+      fn next(& mut self) -> Option< ($t, T) > {
+        if let Some(elem) = self.map.pop() {
+          let res = (self.cursor, elem) ;
+          self.cursor.inc() ;
+          Some(res)
+        } else {
+          None
         }
       }
     }
