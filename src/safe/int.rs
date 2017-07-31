@@ -386,6 +386,11 @@ macro_rules! wrap_usize {
       pub fn shrink(& mut self) {
         self.vec.shrink_to_fit()
       }
+      /// Swap remove operation lifted from `Vec`.
+      #[inline]
+      pub fn swap_remove(& mut self, idx: $t) -> T {
+        self.vec.swap_remove(* idx)
+      }
     }
     impl<T: Clone> $map<T> {
       /// Creates an empty vector with some capacity.
