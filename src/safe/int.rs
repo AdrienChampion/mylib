@@ -310,7 +310,7 @@ macro_rules! wrap_usize {
 
   // Map: vector indexed by `$t` (internal).
   (
- |   internal| $t:ident #[$cmt:meta]
+    |internal| $t:ident #[$cmt:meta]
     map: $map:ident with iter: $iter:ident
     $($tail:tt)*
   ) => (
@@ -460,6 +460,46 @@ macro_rules! wrap_usize {
         & mut self.vec[ index.get() ]
       }
     }
+    impl<T> ::std::ops::Index<
+      ::std::ops::Range<usize>
+    > for $map<T> {
+      type Output = [T] ;
+      fn index(& self, index: ::std::ops::Range<usize>) -> & [T] {
+        self.vec.index(index)
+      }
+    }
+    // impl<T> ::std::ops::Index<
+    //   ::std::ops::RangeInclusive<usize>
+    // > for $map<T> {
+    //   type Output = [T] ;
+    //   fn index(& self, index: ::std::ops::RangeInclusive<usize>) -> & [T] {
+    //     self.vec.index(index)
+    //   }
+    // }
+    impl<T> ::std::ops::Index<
+      ::std::ops::RangeFrom<usize>
+    > for $map<T> {
+      type Output = [T] ;
+      fn index(& self, index: ::std::ops::RangeFrom<usize>) -> & [T] {
+        self.vec.index(index)
+      }
+    }
+    impl<T> ::std::ops::Index<
+      ::std::ops::RangeTo<usize>
+    > for $map<T> {
+      type Output = [T] ;
+      fn index(& self, index: ::std::ops::RangeTo<usize>) -> & [T] {
+        self.vec.index(index)
+      }
+    }
+    // impl<T> ::std::ops::Index<
+    //   ::std::ops::RangeToInclusive<usize>
+    // > for $map<T> {
+    //   type Output = [T] ;
+    //   fn index(& self, index: ::std::ops::RangeToInclusive<usize>) -> & [T] {
+    //     self.vec.index(index)
+    //   }
+    // }
     impl<T> ::std::ops::Deref for $map<T> {
       type Target = Vec<T> ;
       fn deref(& self) -> & Vec<T> {
