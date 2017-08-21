@@ -30,6 +30,7 @@ mod consts {
 
 
 pub mod safe ;
+pub mod coll ;
 
 
 
