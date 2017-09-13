@@ -383,10 +383,15 @@ macro_rules! wrap_usize {
       }
       /// Shrinks the capacity as much as possible.
       #[inline]
-      pub fn shrink(& mut self) {
+      pub fn shrink_to_fit(& mut self) {
         self.vec.shrink_to_fit()
       }
-      /// Swap remove operation lifted from `Vec`.
+      /// Swap from `Vec`.
+      #[inline]
+      pub fn swap(& mut self, a: $t, b: $t) {
+        self.vec.swap(* a, *b)
+      }
+      // Swap remove from `Vec`.
       #[inline]
       pub fn swap_remove(& mut self, idx: $t) -> T {
         self.vec.swap_remove(* idx)
