@@ -411,12 +411,12 @@ macro_rules! wrap_usize {
       }
     }
     impl<T: Eq> Eq for $map<T> {}
-    impl<T: ::std::hash::Hash> ::std::hash::Hash for $map<T> {
-      #[inline]
-      fn hash<H: ::std::hash::Hasher>(& self, state: & mut H) {
-        self.vec.hash(state)
-      }
-    }
+    // impl<T: ::std::hash::Hash> ::std::hash::Hash for $map<T> {
+    //   #[inline]
+    //   fn hash<H: ::std::hash::Hasher>(& self, state: & mut H) {
+    //     self.vec.hash(state)
+    //   }
+    // }
     impl<T> ::std::convert::From< Vec<T> > for $map<T> {
       #[inline]
       fn from(vec: Vec<T>) -> Self {
