@@ -1,22 +1,20 @@
-#![doc = r#"
-Strongly-typed, zero-cost indices wrapping integers.
-
-Nothing in this module is meant to be used directly. The
-[`wrap_usize`](../../macro.wrap_usize.html) does all the work.
-
-Typically used when storing values of some type, say `Term`, in an array.
-Usually some things will be associated with these terms (like the term's *free
-variables*), which one would usually put in another array understood as using
-the same indices as the term array.
-
-But when doing this for more than one type, there is a strong risk of using a
-*term index* for something else. This module wraps `usize`s and gives
-specialized collections making it impossible to mix indices statically.
-
-**NB**: the wrappers use the trivial hash function for speed since this library
-was not written for doing web-oriented things.
-
-"#]
+//! Strongly-typed, zero-cost indices wrapping integers.
+//!
+//! Nothing in this module is meant to be used directly. The
+//! [`wrap_usize`](../../macro.wrap_usize.html) does all the work.
+//!
+//! Typically used when storing values of some type, say `Term`, in an array.
+//! Usually some things will be associated with these terms (like the term's
+//! *free variables*), which one would usually put in another array understood
+//! as using the same indices as the term array.
+//!
+//! But when doing this for more than one type, there is a strong risk of
+//! using a *term index* for something else. This module wraps `usize`s and
+//! gives specialized collections making it impossible to mix indices 
+//! statically.
+//!
+//! **NB**: the wrappers use the trivial hash function for speed since this
+//! library was not written for doing web-oriented things.
 
 use std::hash::Hash ;
 use common::hash::* ;
@@ -24,17 +22,16 @@ use common::hash::* ;
 use self::hash::BuildHashUsize ;
 // use self::hash::{ BuildHashUsize, BuildHashU64 } ;
 
-#[doc = r#"Optimal trivial hash for `usize`s and `u64`s. The former is used for
-wrapped indices, the latter for hashconsed things.
-
-**NEVER USE THIS MODULE DIRECTLY. ONLY THROUGH THE `wrap_usize` MACRO.**
-
-This is kind of unsafe, in a way. The hasher will cause logic errors if asked
-to hash anything else than what it was supposed to hash.
-
-In `debug`, this is actually checked each time something is hashed. This check
-is of course deactivated in `release`.
-"#]
+/// Optimal trivial hash for `usize`s and `u64`s. The former is used for
+/// wrapped indices, the latter for hashconsed things.
+///
+/// **NEVER USE THIS MODULE DIRECTLY. ONLY THROUGH THE `wrap_usize` MACRO.**
+///
+/// This is kind of unsafe, in a way. The hasher will cause logic errors if
+/// asked to hash anything else than what it was supposed to hash.
+///
+/// In `debug`, this is actually checked each time something is hashed. This
+/// check is of course deactivated in `release`.
 mod hash {
   use std::hash::{ Hasher, BuildHasher } ;
 
@@ -80,9 +77,17 @@ mod hash {
     fn test_bytes(_: & [u8]) {}
   }
   impl Hasher for HashUsize {
+    #[cfg(target_pointer_width = "64")]
     fn finish(& self) -> u64 {
       unsafe {
         ::std::mem::transmute(self.buf)
+      }
+    }
+    #[cfg(target_pointer_width = "32")]
+    fn finish(& self) -> u64 {
+      unsafe {
+        let int: u32 = ::std::mem::transmute(self.buf) ;
+        int.into()
       }
     }
     fn write(& mut self, bytes: & [u8]) {
