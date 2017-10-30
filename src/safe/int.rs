@@ -128,6 +128,27 @@ impl<Int: IntWrap + Hash + Eq> IntHSet<Int> {
       set: HashSet::with_capacity_and_hasher(capa, BuildHashUsize {})
     }
   }
+  /// An iterator visiting all elements.
+  #[inline]
+  pub fn iter(& self) -> ::std::collections::hash_set::Iter<Int> {
+    self.set.iter()
+  }
+}
+impl<'a, Int> IntoIterator for & 'a IntHSet<Int>
+where Int: IntWrap + Hash + Eq {
+  type Item = & 'a Int ;
+  type IntoIter = ::std::collections::hash_set::Iter<'a, Int> ;
+  fn into_iter(self) -> Self::IntoIter {
+    (& self.set).into_iter()
+  }
+}
+impl<Int> IntoIterator for IntHSet<Int>
+where Int: IntWrap + Hash + Eq {
+  type Item = Int ;
+  type IntoIter = ::std::collections::hash_set::IntoIter<Int> ;
+  fn into_iter(self) -> Self::IntoIter {
+    self.set.into_iter()
+  }
 }
 impl<Int> Deref for IntHSet<Int>
 where Int: IntWrap + Hash + Eq {
@@ -159,6 +180,44 @@ impl<Int: IntWrap + Hash + Eq, V> IntHMap<Int, V> {
     IntHMap {
       map: HashMap::with_capacity_and_hasher(capa, BuildHashUsize {})
     }
+  }
+  /// An iterator visiting all elements.
+  #[inline]
+  pub fn iter(& self) -> ::std::collections::hash_map::Iter<
+    Int, V
+  > {
+    self.map.iter()
+  }
+  /// An iterator visiting all elements.
+  #[inline]
+  pub fn iter_mut(& mut self) -> ::std::collections::hash_map::IterMut<
+    Int, V
+  > {
+    self.map.iter_mut()
+  }
+}
+impl<'a, Int, V> IntoIterator for & 'a IntHMap<Int, V>
+where Int: IntWrap + Hash + Eq {
+  type Item = (& 'a Int, & 'a V) ;
+  type IntoIter = ::std::collections::hash_map::Iter<'a, Int, V> ;
+  fn into_iter(self) -> Self::IntoIter {
+    (& self.map).into_iter()
+  }
+}
+impl<'a, Int, V> IntoIterator for & 'a mut IntHMap<Int, V>
+where Int: IntWrap + Hash + Eq {
+  type Item = (& 'a Int, & 'a mut V) ;
+  type IntoIter = ::std::collections::hash_map::IterMut<'a, Int, V> ;
+  fn into_iter(self) -> Self::IntoIter {
+    (& mut self.map).into_iter()
+  }
+}
+impl<Int, V> IntoIterator for IntHMap<Int, V>
+where Int: IntWrap + Hash + Eq {
+  type Item = (Int, V) ;
+  type IntoIter = ::std::collections::hash_map::IntoIter<Int, V> ;
+  fn into_iter(self) -> Self::IntoIter {
+    self.map.into_iter()
   }
 }
 impl<Int, V> Deref for IntHMap<Int, V>
