@@ -97,106 +97,83 @@ mod hash {
       }
     }
   }
-
-  // /// Empty struct used to build `HashU64`.
-  // #[derive(Clone)]
-  // pub struct BuildHashU64 {}
-  // impl BuildHasher for BuildHashU64 {
-  //   type Hasher = HashU64 ;
-  //   fn build_hasher(& self) -> HashU64 {
-  //     HashU64 { buf: [0 ; 8] }
-  //   }
-  // }
-  // impl Default for BuildHashU64 {
-  //   fn default() -> Self {
-  //     BuildHashU64 {}
-  //   }
-  // }
-
-  // /// Trivial hasher for `usize`. **This hasher is only for hashing `usize`s**.
-  // pub struct HashU64 {
-  //   buf: [u8 ; 8]
-  // }
-  // impl HashU64 {
-  //   /// Checks that a slice of bytes has the length of a `usize`. Only active
-  //   /// in debug.
-  //   #[cfg(debug)]
-  //   #[inline(always)]
-  //   fn test_bytes(bytes: & [u8]) {
-  //     if bytes.len() != 8 {
-  //       panic!(
-  //         "[illegal] `HashU64::hash` \
-  //         called with non-`u64` argument ({} bytes, expected {})",
-  //         bytes.len(), 8
-  //       )
-  //     }
-  //   }
-  //   /// Checks that a slice of bytes has the length of a `usize`. Only active
-  //   /// in debug.
-  //   #[cfg( not(debug) )]
-  //   #[inline(always)]
-  //   fn test_bytes(_: & [u8]) {}
-  // }
-  // impl Hasher for HashU64 {
-  //   fn finish(& self) -> u64 {
-  //     unsafe {
-  //       ::std::mem::transmute(self.buf)
-  //     }
-  //   }
-  //   fn write(& mut self, bytes: & [u8]) {
-  //     Self::test_bytes(bytes) ;
-  //     for n in 0..8 {
-  //       self.buf[n] = bytes[n]
-  //     }
-  //   }
-  // }
 }
 
-/// Trait letting `HashMap` and `HashSet` be created with `HashUsize`.
-pub trait CanNew {
-  /// Creates a new thing.
-  #[inline]
-  fn new() -> Self ;
-  /// Creates a new thing with a capacity.
-  #[inline]
-  fn with_capacity(capacity: usize) -> Self ;
-}
-impl<K: PartialEq + Eq + Hash, V> CanNew for HashMap<K, V, BuildHashUsize> {
-  fn new() -> Self {
-    Self::with_hasher(BuildHashUsize {})
-  }
-  fn with_capacity(capacity: usize) -> Self {
-    Self::with_capacity_and_hasher(capacity, BuildHashUsize {})
-  }
-}
-impl<T: PartialEq + Eq + Hash> CanNew for HashSet<T, BuildHashUsize> {
-  fn new() -> Self {
-    Self::with_hasher(BuildHashUsize {})
-  }
-  fn with_capacity(capacity: usize) -> Self {
-    Self::with_capacity_and_hasher(capacity, BuildHashUsize {})
-  }
-}
-// impl<K: PartialEq + Eq + Hash, V> CanNew for HashMap<K, V, BuildHashU64> {
-//   fn new() -> Self {
-//     Self::with_hasher(BuildHashU64 {})
-//   }
-//   fn with_capacity(capacity: usize) -> Self {
-//     Self::with_capacity_and_hasher(capacity, BuildHashU64 {})
-//   }
-// }
-// impl<T: PartialEq + Eq + Hash> CanNew for HashSet<T, BuildHashU64> {
-//   fn new() -> Self {
-//     Self::with_hasher(BuildHashU64 {})
-//   }
-//   fn with_capacity(capacity: usize) -> Self {
-//     Self::with_capacity_and_hasher(capacity, BuildHashU64 {})
-//   }
-// }
 
 
-pub type IntSet<Int> = HashSet<Int, BuildHashUsize> ;
-pub type IntHashMap<Int, V> = HashMap<Int, V, BuildHashUsize> ;
+/// Trait implemented by wrappers.
+///
+/// Implementing this trait iff the `usize` returned is a unique identifier
+/// for `self`.
+pub trait IntWrap {
+  fn inner(& self) -> usize ;
+}
+
+use std::ops::{ Deref, DerefMut } ;
+
+/// Wraps a hash set with a trivial hasher.
+pub struct IntHSet<Int: IntWrap + Hash + Eq> {
+  set: HashSet<Int, BuildHashUsize>
+}
+impl<Int: IntWrap + Hash + Eq> IntHSet<Int> {
+  /// Empty hash set.
+  pub fn new() -> IntHSet<Int> {
+    IntHSet {
+      set: HashSet::with_hasher(BuildHashUsize {})
+    }
+  }
+  /// Empty hash set with some capacity.
+  pub fn with_capacity(capa: usize) -> IntHSet<Int> {
+    IntHSet {
+      set: HashSet::with_capacity_and_hasher(capa, BuildHashUsize {})
+    }
+  }
+}
+impl<Int> Deref for IntHSet<Int>
+where Int: IntWrap + Hash + Eq {
+  type Target = HashSet<Int, BuildHashUsize> ;
+  fn deref(& self) -> & HashSet<Int, BuildHashUsize> {
+    & self.set
+  }
+}
+impl<Int> DerefMut for IntHSet<Int>
+where Int: IntWrap + Hash + Eq {
+  fn deref_mut(& mut self) -> & mut HashSet<Int, BuildHashUsize> {
+    & mut self.set
+  }
+}
+
+/// Wraps a hash map with a trivial hasher.
+pub struct IntHMap<Int: IntWrap + Hash + Eq, V> {
+  map: HashMap<Int, V, BuildHashUsize>
+}
+impl<Int: IntWrap + Hash + Eq, V> IntHMap<Int, V> {
+  /// Empty hash map.
+  pub fn new() -> IntHMap<Int, V> {
+    IntHMap {
+      map: HashMap::with_hasher(BuildHashUsize {})
+    }
+  }
+  /// Empty hash map with some capacity.
+  pub fn with_capacity(capa: usize) -> IntHMap<Int, V> {
+    IntHMap {
+      map: HashMap::with_capacity_and_hasher(capa, BuildHashUsize {})
+    }
+  }
+}
+impl<Int, V> Deref for IntHMap<Int, V>
+where Int: IntWrap + Hash + Eq {
+  type Target = HashMap<Int, V, BuildHashUsize> ;
+  fn deref(& self) -> & HashMap<Int, V, BuildHashUsize> {
+    & self.map
+  }
+}
+impl<Int, V> DerefMut for IntHMap<Int, V>
+where Int: IntWrap + Hash + Eq {
+  fn deref_mut(& mut self) -> & mut HashMap<Int, V, BuildHashUsize> {
+    & mut self.map
+  }
+}
 
 
 #[doc = r#"Wraps a `usize` into a struct (zero-cost). Also generates the
@@ -268,14 +245,14 @@ macro_rules! wrap_usize {
   // Set (internal).
   ( |internal| $t:ident #[$cmt:meta] set: $set:ident $($tail:tt)* ) => (
     #[$cmt]
-    pub type $set = $crate::safe::int::IntSet<$t> ;
+    pub type $set = $crate::safe::int::IntHSet<$t> ;
     wrap_usize!{ |internal| $t $($tail)* }
   ) ;
 
   // Hash map (internal).
   ( |internal| $t:ident #[$cmt:meta] hash map: $map:ident $($tail:tt)* ) => (
     #[$cmt]
-    pub type $map<T> = $crate::safe::int::IntHashMap<$t, T> ;
+    pub type $map<T> = $crate::safe::int::IntHMap<$t, T> ;
     wrap_usize!{ |internal| $t $($tail)* }
   ) ;
 
@@ -578,6 +555,9 @@ macro_rules! wrap_usize {
     )]
     pub struct $t {
       val: usize
+    }
+    impl $crate::safe::int::IntWrap for $t {
+      fn inner(& self) -> usize { self.val }
     }
     impl $t {
       /// Wraps an int.
