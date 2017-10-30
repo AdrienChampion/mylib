@@ -112,8 +112,14 @@ pub trait IntWrap {
 use std::ops::{ Deref, DerefMut } ;
 
 /// Wraps a hash set with a trivial hasher.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct IntHSet<Int: IntWrap + Hash + Eq> {
   set: HashSet<Int, BuildHashUsize>
+}
+impl<Int: IntWrap + Hash + Eq> Default for IntHSet<Int> {
+  fn default() -> Self {
+    IntHSet { set: HashSet::default() }
+  }
 }
 impl<Int: IntWrap + Hash + Eq> IntHSet<Int> {
   /// Empty hash set.
@@ -150,6 +156,14 @@ where Int: IntWrap + Hash + Eq {
     self.set.into_iter()
   }
 }
+impl<Int> ::std::iter::FromIterator<Int> for IntHSet<Int>
+where Int: IntWrap + Hash + Eq {
+  fn from_iter<I: IntoIterator<Item = Int>>(iter: I) -> Self {
+    IntHSet {
+      set: HashSet::from_iter(iter)
+    }
+  }
+}
 impl<Int> Deref for IntHSet<Int>
 where Int: IntWrap + Hash + Eq {
   type Target = HashSet<Int, BuildHashUsize> ;
@@ -165,8 +179,14 @@ where Int: IntWrap + Hash + Eq {
 }
 
 /// Wraps a hash map with a trivial hasher.
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct IntHMap<Int: IntWrap + Hash + Eq, V> {
   map: HashMap<Int, V, BuildHashUsize>
+}
+impl<Int: IntWrap + Hash + Eq, V> Default for IntHMap<Int, V> {
+  fn default() -> Self {
+    IntHMap { map: HashMap::default() }
+  }
 }
 impl<Int: IntWrap + Hash + Eq, V> IntHMap<Int, V> {
   /// Empty hash map.
@@ -218,6 +238,14 @@ where Int: IntWrap + Hash + Eq {
   type IntoIter = ::std::collections::hash_map::IntoIter<Int, V> ;
   fn into_iter(self) -> Self::IntoIter {
     self.map.into_iter()
+  }
+}
+impl<Int, V> ::std::iter::FromIterator<(Int, V)> for IntHMap<Int, V>
+where Int: IntWrap + Hash + Eq {
+  fn from_iter<I: IntoIterator<Item = (Int, V)>>(iter: I) -> Self {
+    IntHMap {
+      map: HashMap::from_iter(iter)
+    }
   }
 }
 impl<Int, V> Deref for IntHMap<Int, V>
