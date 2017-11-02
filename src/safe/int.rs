@@ -254,6 +254,12 @@ where Int: IntWrap + Hash + Eq {
     }
   }
 }
+impl<Int, V> ::std::iter::Extend<(Int, V)> for IntHMap<Int, V>
+where Int: IntWrap + Hash + Eq {
+  fn extend<I: IntoIterator<Item = (Int, V)>>(& mut self, iter: I) {
+    self.map.extend(iter)
+  }
+}
 impl<Int, V> Deref for IntHMap<Int, V>
 where Int: IntWrap + Hash + Eq {
   type Target = HashMap<Int, V, BuildHashUsize> ;
