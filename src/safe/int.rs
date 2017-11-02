@@ -164,6 +164,12 @@ where Int: IntWrap + Hash + Eq {
     }
   }
 }
+impl<Int> ::std::iter::Extend<Int> for IntHSet<Int>
+where Int: IntWrap + Hash + Eq {
+  fn extend<I: IntoIterator<Item = Int>>(& mut self, iter: I) {
+    self.set.extend(iter)
+  }
+}
 impl<Int> Deref for IntHSet<Int>
 where Int: IntWrap + Hash + Eq {
   type Target = HashSet<Int, BuildHashUsize> ;
