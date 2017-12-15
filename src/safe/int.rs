@@ -371,7 +371,7 @@ macro_rules! wrap_usize {
     }
     impl $range {
       /// Creates a new range.
-      pub fn mk<
+      pub fn new<
         T1: ::std::convert::Into<$t>,
         T2: ::std::convert::Into<$t>
       >(start: T1, end: T2) -> Self {
@@ -471,7 +471,7 @@ macro_rules! wrap_usize {
       /// Iterates over the elements with the index.
       #[inline]
       pub fn into_index_iter(self) -> $iter<$map<T>> {
-        $iter::mk(self)
+        $iter::new(self)
       }
       /// Iterates over the elements (mutable version).
       #[inline]
@@ -636,7 +636,7 @@ macro_rules! wrap_usize {
     }
     impl<T> $iter<$map<T>> {
       /// Creates an iterator starting at 0.
-      fn mk(mut map: $map<T>) -> Self {
+      fn new(mut map: $map<T>) -> Self {
         map.vec.reverse() ;
         $iter { cursor: $t::zero(), map: map }
       }
@@ -677,7 +677,7 @@ macro_rules! wrap_usize {
     impl $t {
       /// Wraps an int.
       #[inline]
-      pub fn mk(val: usize) -> Self {
+      pub fn new(val: usize) -> Self {
         $t { val: val }
       }
       /// Zero.
@@ -709,13 +709,13 @@ macro_rules! wrap_usize {
     impl ::std::convert::From<usize> for $t {
       #[inline]
       fn from(val: usize) -> Self {
-        $t::mk(val)
+        $t::new(val)
       }
     }
     impl<'a> ::std::convert::From<& 'a usize> for $t {
       #[inline]
       fn from(val: & 'a usize) -> Self {
-        $t::mk(* val)
+        $t::new(* val)
       }
     }
     impl ::std::convert::Into<usize> for $t {
