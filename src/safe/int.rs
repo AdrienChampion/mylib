@@ -412,15 +412,25 @@ macro_rules! wrap_usize {
       }
     }
     impl<T> $map<T> {
-      /// Creates an empty vector from an existing one.
+      /// Creates an empty map from an existing one.
       #[inline]
       pub fn of(vec: Vec<T>) -> Self {
         $map { vec: vec }
       }
-      /// Creates an empty vector with some capacity.
+      /// Creates an empty map.
+      #[inline]
+      pub fn new() -> Self {
+        $map { vec: Vec::new() }
+      }
+      /// Creates an empty map with some capacity.
       #[inline]
       pub fn with_capacity(capacity: usize) -> Self {
         $map { vec: Vec::with_capacity(capacity) }
+      }
+      /// Clears a map.
+      #[inline]
+      pub fn clear(& mut self) {
+        self.vec.clear()
       }
       /// Number of elements in the map.
       #[inline]
