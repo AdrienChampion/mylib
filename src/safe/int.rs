@@ -200,6 +200,14 @@ impl<Int: IntWrap + Hash + Eq, V> Default for IntHMap<Int, V> {
     IntHMap { map: HashMap::default() }
   }
 }
+impl<Int: IntWrap + Hash + Eq, V: Hash> Hash for IntHMap<Int, V> {
+  fn hash<H>(& self, state: & mut H) where H: ::std::hash::Hasher {
+    for (key, val) in self {
+      state.write_usize( key.inner() ) ;
+      val.hash(state)
+    }
+  }
+}
 impl<Int: IntWrap + Hash + Eq, V> IntHMap<Int, V> {
   /// Empty hash map.
   pub fn new() -> IntHMap<Int, V> {
