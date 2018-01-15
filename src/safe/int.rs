@@ -620,6 +620,7 @@ macro_rules! wrap_usize {
     }
     /// Structure allowing to iterate over the elements of a map and their
     /// index.
+    #[derive(Clone)]
     pub struct $iter<T> {
       cursor: $t,
       map: T,
