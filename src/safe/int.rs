@@ -410,7 +410,7 @@ macro_rules! wrap_usize {
     $($tail:tt)*
   ) => (
     #[$cmt]
-    #[derive(Debug)]
+    #[derive(Debug, PartialOrd, Ord)]
     pub struct $map<T> {
       vec: Vec<T>
     }
