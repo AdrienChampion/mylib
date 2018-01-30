@@ -476,6 +476,14 @@ macro_rules! wrap_usize {
       where T: 'a {
         $iter::mk_ref(self)
       }
+      /// Iterates over the elements with the index, mutable version.
+      #[inline]
+      pub fn index_iter_mut<'a>(& 'a mut self) -> $iter<
+        ::std::slice::IterMut<'a, T>
+      >
+      where T: 'a {
+        $iter::mk_ref_mut(self)
+      }
       /// Iterates over the elements with the index.
       #[inline]
       pub fn into_index_iter(self) -> $iter<$map<T>> {
@@ -641,6 +649,26 @@ macro_rules! wrap_usize {
           self.cursor.inc() ;
           Some(res)
         }
+      }
+    }
+    impl<'a, T: 'a> $iter<::std::slice::IterMut<'a, T>> {
+      /// Creates an iterator starting at 0, mutable version.
+      fn mk_ref_mut(map: & 'a mut $map<T>) -> Self {
+        $iter { cursor: $t::zero(), map: map.vec.iter_mut() }
+      }
+    }
+    impl<'a, T: 'a> ::std::iter::Iterator for $iter<
+      ::std::slice::IterMut<'a, T>
+    > {
+      type Item = ($t, & 'a mut T) ;
+      fn next(& mut self) -> Option< ($t, & 'a mut T) > {
+        self.map.next().map(
+          |res| {
+            let index = self.cursor ;
+            self.cursor.inc() ;
+            (index, res)
+          }
+        )
       }
     }
     impl<T> $iter<$map<T>> {
