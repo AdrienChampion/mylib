@@ -92,9 +92,9 @@ mod hash {
     }
     fn write(& mut self, bytes: & [u8]) {
       Self::test_bytes(bytes) ;
-      for n in 0..usize_bytes {
-        self.buf[n] = bytes[n]
-      }
+      self.buf[ .. usize_bytes ].clone_from_slice(
+        & bytes[ .. usize_bytes]
+      )
     }
   }
 }
@@ -106,6 +106,7 @@ mod hash {
 /// Implementing this trait iff the `usize` returned is a unique identifier
 /// for `self`.
 pub trait IntWrap {
+  /// Gives access to the inner value.
   fn inner(& self) -> usize ;
 }
 
@@ -191,13 +192,18 @@ where Int: IntWrap + Hash + Eq {
 }
 
 /// Wraps a hash map with a trivial hasher.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Eq)]
 pub struct IntHMap<Int: IntWrap + Hash + Eq, V> {
   map: HashMap<Int, V, BuildHashUsize>
 }
 impl<Int: IntWrap + Hash + Eq, V> Default for IntHMap<Int, V> {
   fn default() -> Self {
     IntHMap { map: HashMap::default() }
+  }
+}
+impl<Int: IntWrap + Hash + Eq, V: PartialEq> PartialEq for IntHMap<Int, V> {
+  fn eq(& self, other: & Self) -> bool {
+    self.map.eq(other)
   }
 }
 impl<Int: IntWrap + Hash + Eq, V: Hash> Hash for IntHMap<Int, V> {
@@ -414,6 +420,9 @@ macro_rules! wrap_usize {
     pub struct $map<T> {
       vec: Vec<T>
     }
+    impl<T> Default for $map<T> {
+      fn default() -> Self { Self::new() }
+    }
     impl<T: Clone> Clone for $map<T> {
       fn clone(& self) -> Self {
         $map { vec: self.vec.clone() }
@@ -504,7 +513,7 @@ macro_rules! wrap_usize {
       pub fn swap(& mut self, a: $t, b: $t) {
         self.vec.swap(* a, *b)
       }
-      // Swap remove from `Vec`.
+      /// Swap remove from `Vec`.
       #[inline]
       pub fn swap_remove(& mut self, idx: $t) -> T {
         self.vec.swap_remove(* idx)

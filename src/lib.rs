@@ -1,5 +1,7 @@
 //! Things I find useful.
 
+#![forbid(missing_docs)]
+
 extern crate ansi_term as ansi ;
 
 /// Convenient re-exports.
