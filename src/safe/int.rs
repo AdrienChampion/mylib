@@ -387,14 +387,14 @@ macro_rules! wrap_usize {
     ( |internal| $t:ident #[$cmt:meta] set: $set:ident $($tail:tt)* ) => (
         #[$cmt]
         pub type $set = $crate::safe::int::IntHSet<$t> ;
-        wrap_usize!{ |internal| $t $($tail)* }
+        $crate::wrap_usize!{ |internal| $t $($tail)* }
     ) ;
 
     // Hash map (internal).
     ( |internal| $t:ident #[$cmt:meta] hash map: $map:ident $($tail:tt)* ) => (
         #[$cmt]
         pub type $map<T> = $crate::safe::int::IntHMap<$t, T> ;
-        wrap_usize!{ |internal| $t $($tail)* }
+        $crate::wrap_usize!{ |internal| $t $($tail)* }
     ) ;
 
     // Range (internal).
@@ -428,7 +428,7 @@ macro_rules! wrap_usize {
                 }
             }
         }
-        wrap_usize!{ |internal| $t $($tail)* }
+        $crate::wrap_usize!{ |internal| $t $($tail)* }
     ) ;
 
     // Map: vector indexed by `$t` (internal).
@@ -715,7 +715,7 @@ macro_rules! wrap_usize {
                 }
             }
         }
-        wrap_usize!{ |internal| $t $($tail)* }
+        $crate::wrap_usize!{ |internal| $t $($tail)* }
     ) ;
 
     // Terminal case (internal).
@@ -831,7 +831,7 @@ macro_rules! wrap_usize {
                 self.val.partial_cmp(int)
             }
         }
-        wrap_usize!{ |internal| $t $($tail)* }
+        $crate::wrap_usize!{ |internal| $t $($tail)* }
     ) ;
 }
 
