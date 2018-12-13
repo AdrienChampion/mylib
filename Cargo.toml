@@ -2,6 +2,7 @@
 name = "mylib"
 version = "0.1.0"
 authors = ["Adrien Champion <adrien.champion@email.com>"]
+edition = "2018"
 
 [dependencies]
 ansi_term = "*"
